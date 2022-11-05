@@ -1,4 +1,6 @@
-﻿namespace ASU.Core.DTO
+﻿using ASU.Core.Entities;
+
+namespace ASU.Core.DTO
 {
     public class DepartmentDTO
     {
@@ -8,5 +10,6 @@
         public FacultyDTO Faculty { get; set; }
         public ICollection<ProfessionDTO> Professions { get; set; }
         public ICollection<TeacherDTO> Teachers { get; set; }
+        public DepartmentHeadDTO DepartmentHead { get; set; }
     }
 }

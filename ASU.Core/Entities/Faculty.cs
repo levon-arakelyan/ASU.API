@@ -9,5 +9,6 @@ namespace ASU.Core.Entities
         public int Id { get; set; }
         public string Name { get; set; }
         public virtual ICollection<Department> Departments { get; set; }
+        public virtual FacultyHead FacultyHead { get; set; }
     }
 }

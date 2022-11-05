@@ -172,6 +172,43 @@ namespace ASU.Database.Migrations
                     b.ToTable("Departments", "dbo");
                 });
 
+            modelBuilder.Entity("ASU.Core.Entities.DepartmentHead", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedOnUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("DepartmentId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TeacherId")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("UpdatedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("UpdatedOnUtc")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DepartmentId")
+                        .IsUnique();
+
+                    b.HasIndex("TeacherId")
+                        .IsUnique();
+
+                    b.ToTable("DepartmentHeads", "dbo");
+                });
+
             modelBuilder.Entity("ASU.Core.Entities.Faculty", b =>
                 {
                     b.Property<int>("Id")
@@ -199,6 +236,43 @@ namespace ASU.Database.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Faculties", "dbo");
+                });
+
+            modelBuilder.Entity("ASU.Core.Entities.FacultyHead", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<Guid>("CreatedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedOnUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("FacultyId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TeacherId")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("UpdatedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("UpdatedOnUtc")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("FacultyId")
+                        .IsUnique();
+
+                    b.HasIndex("TeacherId")
+                        .IsUnique();
+
+                    b.ToTable("FacultyHeads", "dbo");
                 });
 
             modelBuilder.Entity("ASU.Core.Entities.Profession", b =>
@@ -418,12 +492,6 @@ namespace ASU.Database.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("IsDepartmentHead")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsFacultyHead")
-                        .HasColumnType("bit");
-
                     b.Property<string>("LastName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -521,6 +589,44 @@ namespace ASU.Database.Migrations
                         .IsRequired();
 
                     b.Navigation("Faculty");
+                });
+
+            modelBuilder.Entity("ASU.Core.Entities.DepartmentHead", b =>
+                {
+                    b.HasOne("ASU.Core.Entities.Department", "Department")
+                        .WithOne("DepartmentHead")
+                        .HasForeignKey("ASU.Core.Entities.DepartmentHead", "DepartmentId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("ASU.Core.Entities.Teacher", "Head")
+                        .WithOne("DepartmentHead")
+                        .HasForeignKey("ASU.Core.Entities.DepartmentHead", "TeacherId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("Department");
+
+                    b.Navigation("Head");
+                });
+
+            modelBuilder.Entity("ASU.Core.Entities.FacultyHead", b =>
+                {
+                    b.HasOne("ASU.Core.Entities.Faculty", "Faculty")
+                        .WithOne("FacultyHead")
+                        .HasForeignKey("ASU.Core.Entities.FacultyHead", "FacultyId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("ASU.Core.Entities.Teacher", "Head")
+                        .WithOne("FacultyHead")
+                        .HasForeignKey("ASU.Core.Entities.FacultyHead", "TeacherId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("Faculty");
+
+                    b.Navigation("Head");
                 });
 
             modelBuilder.Entity("ASU.Core.Entities.Profession", b =>
@@ -655,6 +761,9 @@ namespace ASU.Database.Migrations
 
             modelBuilder.Entity("ASU.Core.Entities.Department", b =>
                 {
+                    b.Navigation("DepartmentHead")
+                        .IsRequired();
+
                     b.Navigation("Professions");
 
                     b.Navigation("Teachers");
@@ -663,6 +772,9 @@ namespace ASU.Database.Migrations
             modelBuilder.Entity("ASU.Core.Entities.Faculty", b =>
                 {
                     b.Navigation("Departments");
+
+                    b.Navigation("FacultyHead")
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("ASU.Core.Entities.Profession", b =>
@@ -689,6 +801,12 @@ namespace ASU.Database.Migrations
             modelBuilder.Entity("ASU.Core.Entities.Teacher", b =>
                 {
                     b.Navigation("CourseSubjects");
+
+                    b.Navigation("DepartmentHead")
+                        .IsRequired();
+
+                    b.Navigation("FacultyHead")
+                        .IsRequired();
 
                     b.Navigation("Schedule");
 

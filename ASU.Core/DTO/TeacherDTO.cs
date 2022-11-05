@@ -1,4 +1,6 @@
-﻿namespace ASU.Core.DTO
+﻿using ASU.Core.Entities;
+
+namespace ASU.Core.DTO
 {
     public class TeacherDTO
     {
@@ -14,6 +16,8 @@
         public ICollection<ScheduleDTO> Schedule { get; set; }
         public FacultyDTO DeanForFaculty { get; set; }
         public DepartmentDTO HeadOfDepartment { get; set; }
+        public DepartmentHeadDTO DepartmentHead { get; set; }
+        public FacultyHeadDTO FacultyHead { get; set; }
 
     }
 }

@@ -11,7 +11,9 @@ namespace ASU.Database
         public virtual DbSet<Audience> Audiences { get; set; }
         public virtual DbSet<Course> Courses { get; set; }
         public virtual DbSet<Department> Departments { get; set; }
+        public virtual DbSet<DepartmentHead> DepartmentHeads { get; set; }
         public virtual DbSet<Faculty> Faculties { get; set; }
+        public virtual DbSet<FacultyHead> FacultyHeads { get; set; }
         public virtual DbSet<Profession> Professions { get; set; }
         public virtual DbSet<Student> Students { get; set; }
         public virtual DbSet<Teacher> Teachers { get; set; }
@@ -46,6 +48,15 @@ namespace ASU.Database
                 t.HasKey(_ => _.Id);
                 t.HasOne(_ => _.Faculty).WithMany(_ => _.Departments).OnDelete(DeleteBehavior.NoAction);
                 t.HasMany(_ => _.Professions).WithOne(_ => _.Department).OnDelete(DeleteBehavior.NoAction);
+                t.HasOne(_ => _.DepartmentHead).WithOne(_ => _.Department).OnDelete(DeleteBehavior.NoAction);
+            });
+
+            modelBuilder.Entity<DepartmentHead>(t =>
+            {
+                t.ToTable("DepartmentHeads", "dbo");
+                t.HasKey(_ => _.Id);
+                t.HasOne(_ => _.Department).WithOne(_ => _.DepartmentHead).OnDelete(DeleteBehavior.NoAction);
+                t.HasOne(_ => _.Head).WithOne(_ => _.DepartmentHead).OnDelete(DeleteBehavior.NoAction);
             });
 
             modelBuilder.Entity<Faculty>(t =>
@@ -53,6 +64,15 @@ namespace ASU.Database
                 t.ToTable("Faculties", "dbo");
                 t.HasKey(_ => _.Id);
                 t.HasMany(_ => _.Departments).WithOne(_ => _.Faculty).OnDelete(DeleteBehavior.NoAction);
+                t.HasOne(_ => _.FacultyHead).WithOne(_ => _.Faculty).OnDelete(DeleteBehavior.NoAction);
+            });
+
+            modelBuilder.Entity<FacultyHead>(t =>
+            {
+                t.ToTable("FacultyHeads", "dbo");
+                t.HasKey(_ => _.Id);
+                t.HasOne(_ => _.Faculty).WithOne(_ => _.FacultyHead).OnDelete(DeleteBehavior.NoAction);
+                t.HasOne(_ => _.Head).WithOne(_ => _.FacultyHead).OnDelete(DeleteBehavior.NoAction);
             });
 
             modelBuilder.Entity<Profession>(t =>
@@ -79,6 +99,8 @@ namespace ASU.Database
                 t.HasMany(_ => _.TeacherSubjects).WithOne(_ => _.Teacher).OnDelete(DeleteBehavior.NoAction);
                 t.HasMany(_ => _.CourseSubjects).WithOne(_ => _.Teacher).OnDelete(DeleteBehavior.NoAction);
                 t.HasMany(_ => _.Schedule).WithOne(_ => _.Teacher).OnDelete(DeleteBehavior.NoAction);
+                t.HasOne(_ => _.DepartmentHead).WithOne(_ => _.Head).OnDelete(DeleteBehavior.NoAction);
+                t.HasOne(_ => _.FacultyHead).WithOne(_ => _.Head).OnDelete(DeleteBehavior.NoAction);
             });
 
             modelBuilder.Entity<Subject>(t =>

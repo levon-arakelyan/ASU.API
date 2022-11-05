@@ -1,5 +1,4 @@
-﻿using ASU.Core.Entities;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace ASU.Core.Entities
 {
@@ -12,5 +11,6 @@ namespace ASU.Core.Entities
         public virtual Faculty Faculty { get; set; }
         public virtual ICollection<Profession> Professions { get; set; }
         public virtual ICollection<Teacher> Teachers { get; set; }
+        public virtual DepartmentHead DepartmentHead { get; set; }
     }
 }

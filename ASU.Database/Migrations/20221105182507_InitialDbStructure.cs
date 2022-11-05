@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
@@ -131,8 +132,6 @@ namespace ASU.Database.Migrations
                     Salary = table.Column<int>(type: "int", nullable: false),
                     Rate = table.Column<double>(type: "float", nullable: false),
                     DepartmentId = table.Column<int>(type: "int", nullable: false),
-                    IsDepartmentHead = table.Column<bool>(type: "bit", nullable: false),
-                    IsFacultyHead = table.Column<bool>(type: "bit", nullable: false),
                     CreatedOnUtc = table.Column<DateTime>(type: "datetime2", nullable: false),
                     CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     UpdatedOnUtc = table.Column<DateTime>(type: "datetime2", nullable: false),
@@ -172,6 +171,68 @@ namespace ASU.Database.Migrations
                         column: x => x.ProfessionId,
                         principalSchema: "dbo",
                         principalTable: "Professions",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "DepartmentHeads",
+                schema: "dbo",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    DepartmentId = table.Column<int>(type: "int", nullable: false),
+                    TeacherId = table.Column<int>(type: "int", nullable: false),
+                    CreatedOnUtc = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    UpdatedOnUtc = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_DepartmentHeads", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_DepartmentHeads_Departments_DepartmentId",
+                        column: x => x.DepartmentId,
+                        principalSchema: "dbo",
+                        principalTable: "Departments",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_DepartmentHeads_Teachers_TeacherId",
+                        column: x => x.TeacherId,
+                        principalSchema: "dbo",
+                        principalTable: "Teachers",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "FacultyHeads",
+                schema: "dbo",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    FacultyId = table.Column<int>(type: "int", nullable: false),
+                    TeacherId = table.Column<int>(type: "int", nullable: false),
+                    CreatedOnUtc = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    UpdatedOnUtc = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_FacultyHeads", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_FacultyHeads_Faculties_FacultyId",
+                        column: x => x.FacultyId,
+                        principalSchema: "dbo",
+                        principalTable: "Faculties",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_FacultyHeads_Teachers_TeacherId",
+                        column: x => x.TeacherId,
+                        principalSchema: "dbo",
+                        principalTable: "Teachers",
                         principalColumn: "Id");
                 });
 
@@ -378,10 +439,38 @@ namespace ASU.Database.Migrations
                 column: "TeacherId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_DepartmentHeads_DepartmentId",
+                schema: "dbo",
+                table: "DepartmentHeads",
+                column: "DepartmentId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_DepartmentHeads_TeacherId",
+                schema: "dbo",
+                table: "DepartmentHeads",
+                column: "TeacherId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Departments_FacultyId",
                 schema: "dbo",
                 table: "Departments",
                 column: "FacultyId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_FacultyHeads_FacultyId",
+                schema: "dbo",
+                table: "FacultyHeads",
+                column: "FacultyId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_FacultyHeads_TeacherId",
+                schema: "dbo",
+                table: "FacultyHeads",
+                column: "TeacherId",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_Professions_DepartmentId",
@@ -460,6 +549,14 @@ namespace ASU.Database.Migrations
         {
             migrationBuilder.DropTable(
                 name: "CourseSubjects",
+                schema: "dbo");
+
+            migrationBuilder.DropTable(
+                name: "DepartmentHeads",
+                schema: "dbo");
+
+            migrationBuilder.DropTable(
+                name: "FacultyHeads",
                 schema: "dbo");
 
             migrationBuilder.DropTable(
