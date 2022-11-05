@@ -1,0 +1,131 @@
+﻿using ASU.Core.Entities;
+using Microsoft.EntityFrameworkCore;
+
+namespace ASU.Database
+{
+    public class ASUContext : DbContext
+    {
+        public ASUContext(DbContextOptions<ASUContext> options) : base(options)
+        { }
+
+        public virtual DbSet<Audience> Audiences { get; set; }
+        public virtual DbSet<Course> Courses { get; set; }
+        public virtual DbSet<Department> Departments { get; set; }
+        public virtual DbSet<Faculty> Faculties { get; set; }
+        public virtual DbSet<Profession> Professions { get; set; }
+        public virtual DbSet<Student> Students { get; set; }
+        public virtual DbSet<Teacher> Teachers { get; set; }
+        public virtual DbSet<Subject> Subjects { get; set; }
+        public virtual DbSet<CourseSubject> CourseSubjects { get; set; }
+        public virtual DbSet<StudentSubject> StudentSubjects { get; set; }
+        public virtual DbSet<TeacherSubject> TeacherSubjects { get; set; }
+        public virtual DbSet<Schedule> Schedules { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Audience>(t =>
+            {
+                t.ToTable("Audiences", "dbo");
+                t.HasKey(_ => _.Id);
+                t.HasMany(_ => _.Schedule).WithOne(_ => _.Audience).OnDelete(DeleteBehavior.NoAction);
+            });
+
+            modelBuilder.Entity<Course>(t =>
+            {
+                t.ToTable("Courses", "dbo");
+                t.HasKey(_ => _.Id);
+                t.HasOne(_ => _.Profession).WithMany(_ => _.Courses).OnDelete(DeleteBehavior.NoAction);
+                t.HasMany(_ => _.Students).WithOne(_ => _.Course).OnDelete(DeleteBehavior.NoAction);
+                t.HasMany(_ => _.CourseSubjects).WithOne(_ => _.Course).OnDelete(DeleteBehavior.NoAction);
+                t.HasMany(_ => _.Schedule).WithOne(_ => _.Course).OnDelete(DeleteBehavior.NoAction);
+            });
+
+            modelBuilder.Entity<Department>(t =>
+            {
+                t.ToTable("Departments", "dbo");
+                t.HasKey(_ => _.Id);
+                t.HasOne(_ => _.Faculty).WithMany(_ => _.Departments).OnDelete(DeleteBehavior.NoAction);
+                t.HasMany(_ => _.Professions).WithOne(_ => _.Department).OnDelete(DeleteBehavior.NoAction);
+            });
+
+            modelBuilder.Entity<Faculty>(t =>
+            {
+                t.ToTable("Faculties", "dbo");
+                t.HasKey(_ => _.Id);
+                t.HasMany(_ => _.Departments).WithOne(_ => _.Faculty).OnDelete(DeleteBehavior.NoAction);
+            });
+
+            modelBuilder.Entity<Profession>(t =>
+            {
+                t.ToTable("Professions", "dbo");
+                t.HasKey(_ => _.Id);
+                t.HasOne(_ => _.Department).WithMany(_ => _.Professions).OnDelete(DeleteBehavior.NoAction);
+                t.HasMany(_ => _.Courses).WithOne(_ => _.Profession).OnDelete(DeleteBehavior.NoAction);
+            });
+
+            modelBuilder.Entity<Student>(t =>
+            {
+                t.ToTable("Students", "dbo");
+                t.HasKey(_ => _.Id);
+                t.HasOne(_ => _.Course).WithMany(_ => _.Students).OnDelete(DeleteBehavior.NoAction);
+                t.HasMany(_ => _.StudentSubjects).WithOne(_ => _.Student).OnDelete(DeleteBehavior.NoAction);
+            });
+
+            modelBuilder.Entity<Teacher>(t =>
+            {
+                t.ToTable("Teachers", "dbo");
+                t.HasKey(_ => _.Id);
+                t.HasOne(_ => _.Department).WithMany(_ => _.Teachers).OnDelete(DeleteBehavior.NoAction);
+                t.HasMany(_ => _.TeacherSubjects).WithOne(_ => _.Teacher).OnDelete(DeleteBehavior.NoAction);
+                t.HasMany(_ => _.CourseSubjects).WithOne(_ => _.Teacher).OnDelete(DeleteBehavior.NoAction);
+                t.HasMany(_ => _.Schedule).WithOne(_ => _.Teacher).OnDelete(DeleteBehavior.NoAction);
+            });
+
+            modelBuilder.Entity<Subject>(t =>
+            {
+                t.ToTable("Subjects", "dbo");
+                t.HasKey(_ => _.Id);
+                t.HasMany(_ => _.CourseSubjects).WithOne(_ => _.Subject).OnDelete(DeleteBehavior.NoAction);
+                t.HasMany(_ => _.StudentSubjects).WithOne(_ => _.Subject).OnDelete(DeleteBehavior.NoAction);
+                t.HasMany(_ => _.TeacherSubjects).WithOne(_ => _.Subject).OnDelete(DeleteBehavior.NoAction);
+                t.HasMany(_ => _.Schedule).WithOne(_ => _.Subject);
+            });
+
+            modelBuilder.Entity<CourseSubject>(t =>
+            {
+                t.ToTable("CourseSubjects", "dbo");
+                t.HasKey(_ => _.Id);
+                t.HasOne(_ => _.Course).WithMany(_ => _.CourseSubjects).OnDelete(DeleteBehavior.NoAction);
+                t.HasOne(_ => _.Subject).WithMany(_ => _.CourseSubjects).OnDelete(DeleteBehavior.NoAction);
+                t.HasOne(_ => _.Teacher).WithMany(_ => _.CourseSubjects).OnDelete(DeleteBehavior.NoAction);
+            });
+
+            modelBuilder.Entity<TeacherSubject>(t =>
+            {
+                t.ToTable("TeacherSubjects", "dbo");
+                t.HasKey(_ => _.Id);
+                t.HasOne(_ => _.Teacher).WithMany(_ => _.TeacherSubjects).OnDelete(DeleteBehavior.NoAction);
+                t.HasOne(_ => _.Subject).WithMany(_ => _.TeacherSubjects).OnDelete(DeleteBehavior.NoAction);
+            });
+
+            modelBuilder.Entity<StudentSubject>(t =>
+            {
+                t.ToTable("StudentSubjects", "dbo");
+                t.HasKey(_ => _.Id);
+                t.HasOne(_ => _.Student).WithMany(_ => _.StudentSubjects).OnDelete(DeleteBehavior.NoAction);
+                t.HasOne(_ => _.Subject).WithMany(_ => _.StudentSubjects).OnDelete(DeleteBehavior.NoAction);
+                t.HasOne(_ => _.Course).WithMany(_ => _.StudentSubjects).OnDelete(DeleteBehavior.NoAction);
+            });
+
+            modelBuilder.Entity<Schedule>(t =>
+            {
+                t.ToTable("Schedules", "dbo");
+                t.HasKey(_ => _.Id);
+                t.HasOne(_ => _.Course).WithMany(_ => _.Schedule).OnDelete(DeleteBehavior.NoAction);
+                t.HasOne(_ => _.Teacher).WithMany(_ => _.Schedule).OnDelete(DeleteBehavior.NoAction);
+                t.HasOne(_ => _.Subject).WithMany(_ => _.Schedule).OnDelete(DeleteBehavior.NoAction);
+                t.HasOne(_ => _.Audience).WithMany(_ => _.Schedule).OnDelete(DeleteBehavior.NoAction);
+            });
+        }
+    }
+}
