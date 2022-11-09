@@ -1,15 +1,10 @@
-﻿using ASU.Core.DTO;
-using System.ComponentModel.DataAnnotations;
-
-namespace ASU.Core.Entities
+﻿
+namespace ASU.Core.DTO
 {
     public class FacultyHeadDTO
     {
-        [Key]
         public int Id { get; set; }
-        public int FacultyId { get; set; }
-        public int TeacherId { get; set; }
-        public virtual FacultyDTO Faculty { get; set; }
-        public virtual TeacherDTO Head { get; set; }
+        public FacultyDTO Faculty { get; set; }
+        public TeacherDTO Head { get; set; }
     }
 }

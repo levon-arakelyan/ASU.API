@@ -24,10 +24,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Controllers\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\ASU.Core\ASU.Core.csproj" />
     <ProjectReference Include="..\ASU.Database\ASU.Database.csproj" />
     <ProjectReference Include="..\ASU.Services\ASU.Services.csproj" />

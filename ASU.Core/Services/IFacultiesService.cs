@@ -4,6 +4,6 @@ namespace ASU.Core.Services
 {
     public interface IFacultiesService
     {
-        Task<FacultyDTO> Get(int facultyId);
+        Task Add(FacultyDTO facultyDto);
     }
 }

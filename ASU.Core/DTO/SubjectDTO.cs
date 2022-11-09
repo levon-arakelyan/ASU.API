@@ -7,7 +7,7 @@
         public CourseDTO Course { get; set; }
         public ICollection<CourseSubjectDTO> CourseSubjects { get; set; }
         public ICollection<StudentSubjectDTO> StudentSubjects { get; set; }
-        public ICollection<TeacherSubjectDTO> SubjectTeachers { get; set; }
+        public ICollection<TeacherSubjectDTO> TeacherSubjects { get; set; }
         public ICollection<ScheduleDTO> Schedule { get; set; }
     }
 }

@@ -1,4 +1,4 @@
-﻿using ASU.Core.Entities;
+﻿using ASU.Core.Database.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace ASU.Database
@@ -147,6 +147,43 @@ namespace ASU.Database
                 t.HasOne(_ => _.Teacher).WithMany(_ => _.Schedule).OnDelete(DeleteBehavior.NoAction);
                 t.HasOne(_ => _.Subject).WithMany(_ => _.Schedule).OnDelete(DeleteBehavior.NoAction);
                 t.HasOne(_ => _.Audience).WithMany(_ => _.Schedule).OnDelete(DeleteBehavior.NoAction);
+            });
+
+            SeedData(modelBuilder);
+        }
+
+        private void SeedData(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Faculty>().HasData(new Faculty()
+            {
+                Id = 1,
+                Name = "Բնագիտական"
+            });
+
+            modelBuilder.Entity<Department>().HasData(new Department()
+            {
+                Id = 1,
+                FacultyId = 1,
+                Name = "Կիրառական մաթեմատիկա և ինֆորմատիկա"
+            });
+
+            modelBuilder.Entity<Teacher>().HasData(new Teacher()
+            {
+                Id = 1,
+                FirstName = "Վոլոդյա",
+                LastName = "Միրզոյան",
+                Email = "volodyamirzoyan@mail.ru",
+                Password = "$2a$04$z3wvBnd4orVJ.mWvXYECeuCVi3qd/uhQLeqfzoSHujb6QOiy0q.Fm",
+                Salary = 400000,
+                Rate = 1,
+                DepartmentId = 1
+            });
+
+            modelBuilder.Entity<FacultyHead>().HasData(new FacultyHead()
+            {
+                Id = 1,
+                FacultyId = 1,
+                TeacherId = 1
             });
         }
     }
