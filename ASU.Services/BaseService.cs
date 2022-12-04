@@ -4,12 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ASU.Core.Enums
+namespace ASU.Services
 {
-    public enum StudentDegree
+    internal class BaseService
     {
-        Bachelor,
-        Magister,
-        Postgraduate
     }
 }

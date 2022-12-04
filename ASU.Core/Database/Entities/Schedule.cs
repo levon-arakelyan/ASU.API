@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace ASU.Core.Database.Entities
 {
-    public class Schedule
+    public class Schedule : AuditableUtcEntity
     {
         [Key]
         public int Id { get; set; }
@@ -18,7 +18,7 @@ namespace ASU.Core.Database.Entities
         {
             get
             {
-                var courseSubject = Course.CourseSubjects.FirstOrDefault(x => x.SubjectId == SubjectId);
+                var courseSubject = Course?.CourseSubjects?.FirstOrDefault(x => x.SubjectId == SubjectId);
                 if (courseSubject != null)
                 {
                     return courseSubject.Credit / 2;

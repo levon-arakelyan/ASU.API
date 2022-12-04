@@ -36,16 +36,10 @@ namespace ASU.Database.Migrations
                     b.Property<DateTime?>("CreatedOnUtc")
                         .HasColumnType("datetime2");
 
-                    b.Property<bool>("HasBlackboard")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("HasComputers")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("HasProjector")
-                        .HasColumnType("bit");
-
                     b.Property<int>("Number")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Type")
                         .HasColumnType("int");
 
                     b.Property<int?>("UpdatedBy")
@@ -72,6 +66,12 @@ namespace ASU.Database.Migrations
 
                     b.Property<DateTime?>("CreatedOnUtc")
                         .HasColumnType("datetime2");
+
+                    b.Property<int>("Degree")
+                        .HasColumnType("int");
+
+                    b.Property<int>("EducationType")
+                        .HasColumnType("int");
 
                     b.Property<int>("GroupsNumber")
                         .HasColumnType("int");
@@ -349,6 +349,12 @@ namespace ASU.Database.Migrations
                     b.Property<int>("CourseId")
                         .HasColumnType("int");
 
+                    b.Property<int?>("CreatedBy")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("CreatedOnUtc")
+                        .HasColumnType("datetime2");
+
                     b.Property<int>("DayOfWeek")
                         .HasColumnType("int");
 
@@ -360,6 +366,12 @@ namespace ASU.Database.Migrations
 
                     b.Property<int>("TeacherId")
                         .HasColumnType("int");
+
+                    b.Property<int?>("UpdatedBy")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("UpdatedOnUtc")
+                        .HasColumnType("datetime2");
 
                     b.HasKey("Id");
 
@@ -390,9 +402,6 @@ namespace ASU.Database.Migrations
 
                     b.Property<DateTime?>("CreatedOnUtc")
                         .HasColumnType("datetime2");
-
-                    b.Property<int>("Degree")
-                        .HasColumnType("int");
 
                     b.Property<string>("Email")
                         .IsRequired()
@@ -487,6 +496,9 @@ namespace ASU.Database.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("SubjectGroupId")
+                        .HasColumnType("int");
+
                     b.Property<int?>("UpdatedBy")
                         .HasColumnType("int");
 
@@ -495,7 +507,38 @@ namespace ASU.Database.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("SubjectGroupId");
+
                     b.ToTable("Subjects", "dbo");
+                });
+
+            modelBuilder.Entity("ASU.Core.Database.Entities.SubjectGroup", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<int?>("CreatedBy")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("CreatedOnUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("UpdatedBy")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("UpdatedOnUtc")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("SubjectGroups", "dbo");
                 });
 
             modelBuilder.Entity("ASU.Core.Database.Entities.Teacher", b =>
@@ -511,6 +554,9 @@ namespace ASU.Database.Migrations
 
                     b.Property<DateTime?>("CreatedOnUtc")
                         .HasColumnType("datetime2");
+
+                    b.Property<int>("Degree")
+                        .HasColumnType("int");
 
                     b.Property<int>("DepartmentId")
                         .HasColumnType("int");
@@ -534,9 +580,6 @@ namespace ASU.Database.Migrations
                     b.Property<double>("Rate")
                         .HasColumnType("float");
 
-                    b.Property<int>("Salary")
-                        .HasColumnType("int");
-
                     b.Property<int?>("UpdatedBy")
                         .HasColumnType("int");
 
@@ -553,13 +596,13 @@ namespace ASU.Database.Migrations
                         new
                         {
                             Id = 1,
+                            Degree = 0,
                             DepartmentId = 1,
                             Email = "volodyamirzoyan@mail.ru",
                             FirstName = "Վոլոդյա",
                             LastName = "Միրզոյան",
                             Password = "$2a$04$z3wvBnd4orVJ.mWvXYECeuCVi3qd/uhQLeqfzoSHujb6QOiy0q.Fm",
-                            Rate = 1.0,
-                            Salary = 400000
+                            Rate = 1.0
                         });
                 });
 
@@ -571,11 +614,23 @@ namespace ASU.Database.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
+                    b.Property<int?>("CreatedBy")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("CreatedOnUtc")
+                        .HasColumnType("datetime2");
+
                     b.Property<int>("SubjectId")
                         .HasColumnType("int");
 
                     b.Property<int>("TeacherId")
                         .HasColumnType("int");
+
+                    b.Property<int?>("UpdatedBy")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("UpdatedOnUtc")
+                        .HasColumnType("datetime2");
 
                     b.HasKey("Id");
 
@@ -757,6 +812,17 @@ namespace ASU.Database.Migrations
                     b.Navigation("Subject");
                 });
 
+            modelBuilder.Entity("ASU.Core.Database.Entities.Subject", b =>
+                {
+                    b.HasOne("ASU.Core.Database.Entities.SubjectGroup", "SubjectGroup")
+                        .WithMany("Subjects")
+                        .HasForeignKey("SubjectGroupId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("SubjectGroup");
+                });
+
             modelBuilder.Entity("ASU.Core.Database.Entities.Teacher", b =>
                 {
                     b.HasOne("ASU.Core.Database.Entities.Department", "Department")
@@ -840,6 +906,11 @@ namespace ASU.Database.Migrations
                     b.Navigation("StudentSubjects");
 
                     b.Navigation("TeacherSubjects");
+                });
+
+            modelBuilder.Entity("ASU.Core.Database.Entities.SubjectGroup", b =>
+                {
+                    b.Navigation("Subjects");
                 });
 
             modelBuilder.Entity("ASU.Core.Database.Entities.Teacher", b =>

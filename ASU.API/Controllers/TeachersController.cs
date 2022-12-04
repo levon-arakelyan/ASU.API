@@ -1,4 +1,6 @@
-﻿using ASU.Core.Enums;
+﻿using ASU.Core.DTO;
+using ASU.Core.Enums;
+using ASU.Core.Models;
 using ASU.Core.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -17,11 +19,32 @@ namespace ASU.API.Controllers
             _teachersService = teachersService;
         }
 
-        [HttpGet]
-        public async Task<IActionResult> GetPaged(int page, int pageSize, string orderBy = "id", OrderDirection direction = OrderDirection.Descending, string? filter = "")
+        [HttpGet("get-paged")]
+        public IActionResult GetPaged(int page, int pageSize, string orderBy = "id", OrderDirection direction = OrderDirection.Descending, string? filter = "")
         {
-            var result = await _teachersService.GetPaged(page, pageSize, orderBy, direction, filter);
+            var result = _teachersService.GetPaged(page, pageSize, orderBy, direction, filter);
             return Ok(result);
+        }
+
+        [HttpPost("add")]
+        public async Task<IActionResult> Add([FromBody] NewTeacher teacher)
+        {
+            await _teachersService.Add(teacher);
+            return Ok();
+        }
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> Get(int id)
+        {
+            var teacher = await _teachersService.Get(id, throwException: true);
+            return Ok(teacher);
+        }
+
+        [HttpPatch("edit/{teacherId}")]
+        public async Task<IActionResult> Edit(int teacherId, [FromBody] EditTeacher teacher)
+        {
+            await _teachersService.Edit(teacherId, teacher);
+            return Ok();
         }
     }
 }

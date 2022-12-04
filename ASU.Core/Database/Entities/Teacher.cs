@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using ASU.Core.Enums;
+using System.ComponentModel.DataAnnotations;
 
 namespace ASU.Core.Database.Entities
 {
@@ -8,11 +9,18 @@ namespace ASU.Core.Database.Entities
         public int Id { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
+        public string FullName
+        {
+            get
+            {
+                return FirstName + " " + LastName;
+            }
+        }
         public string Password { get; set; }
         public string Email { get; set; }
-        public int Salary { get; set; }
         public double Rate { get; set; }
         public int DepartmentId { get; set; }
+        public TeacherDegree Degree { get; set; }
         public virtual Department Department { get; set; }
         public virtual ICollection<TeacherSubject> TeacherSubjects { get; set; }
         public virtual ICollection<CourseSubject> CourseSubjects { get; set; }

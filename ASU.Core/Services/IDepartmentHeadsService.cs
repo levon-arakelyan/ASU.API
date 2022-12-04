@@ -4,6 +4,6 @@ namespace ASU.Core.Services
 {
     public interface IDepartmentHeadsService
     {
-        Task Add(TeacherDTO teacher);
+        Task TryEdit(int departmentId, int teacherId, bool add);
     }
 }

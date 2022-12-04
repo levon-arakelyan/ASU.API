@@ -26,7 +26,7 @@ namespace ASU.API.Controllers
         }
 
         [Authorize]
-        [HttpGet]
+        [HttpGet("get")]
         public async Task<IActionResult> Get()
         {
             var result = await _accountsService.Get(_claimsService.UserId, _claimsService.Role);

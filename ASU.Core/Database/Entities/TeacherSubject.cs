@@ -2,7 +2,7 @@
 
 namespace ASU.Core.Database.Entities
 {
-    public class TeacherSubject
+    public class TeacherSubject : AuditableUtcEntity
     {
         [Key]
         public int Id { get; set; }

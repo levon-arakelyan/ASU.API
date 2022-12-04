@@ -23,5 +23,8 @@ namespace ASU.Core.Database
         Task AddAsync(T entity, CancellationToken cancellationToken = default(CancellationToken));
         Task DeleteAsync(T entity, CancellationToken cancellationToken = default(CancellationToken));
         Task CommitAsync(CancellationToken cancellationToken = default(CancellationToken));
+        IEnumerable<T> BulkDelete(IEnumerable<T> entities);
+        IEnumerable<T> BulkDeleteWhere(Expression<Func<T, bool>> predicate);
+        IEnumerable<T> BulkAdd(IEnumerable<T> entities);
     }
 }

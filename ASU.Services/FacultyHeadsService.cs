@@ -3,6 +3,7 @@ using ASU.Core.Database.Entities;
 using ASU.Core.DTO;
 using ASU.Core.Services;
 using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 
 namespace ASU.Services
 {
@@ -10,7 +11,9 @@ namespace ASU.Services
     {
         private readonly IMapper _mapper;
         private readonly IDatabaseTable<FacultyHead> _facultyHeadsTable;
-        private const string ErrorNoTeacherGiven = "No data given to add.";
+        private const string ErrorFacultyHeadNotExist = "{0} ֆակուլտետը չունի դեկան";
+        private const string ErrorFacultyHasHead = "{0} ֆակուլտետը արդեն ունի դեկան.";
+        private const string ErrorNoFacultyWithProvidedHead = "{0} ֆակուլտետի դեկանը {0}-ը չէ";
 
         public FacultyHeadsService(IDatabaseTable<FacultyHead> facultyHeadsTable, IMapper mapper)
         {
@@ -18,16 +21,46 @@ namespace ASU.Services
             _mapper = mapper;
         }
 
-        public async Task Add(TeacherDTO teacher)
+        public async Task TryEdit(int facultyId, int teacherId, bool add)
         {
-            if (teacher == null)
-            {
-                throw new ArgumentNullException(ErrorNoTeacherGiven);
-            }
+            var facultyHead = GetQuery().FirstOrDefault(x => x.FacultyId == facultyId);
 
-            var head = _mapper.Map<TeacherDTO, FacultyHead>(teacher);
+            if (facultyHead == null && add)
+            {
+                await Add(facultyId, teacherId);
+            }
+            else if (facultyHead != null && !add)
+            {
+                await Remove(facultyId, teacherId);
+            }
+        }
+
+        private async Task Add(int facultyId, int teacherId)
+        {
+            var head = new FacultyHead()
+            {
+                FacultyId = facultyId,
+                TeacherId = teacherId
+            };
             await _facultyHeadsTable.AddAsync(head);
             await _facultyHeadsTable.CommitAsync();
+        }
+
+        private async Task Remove(int facultyId, int teacherId)
+        {
+            var facultyHead = GetQuery().FirstOrDefault(x => x.FacultyId == facultyId && x.TeacherId == teacherId);
+            if (facultyHead != null)
+            {
+                await _facultyHeadsTable.DeleteAsync(facultyHead);
+            }
+        }
+
+        private IQueryable<FacultyHead> GetQuery()
+        {
+            return _facultyHeadsTable
+                .Queryable()
+                .Include(x => x.Faculty)
+                .Include(x => x.Head);
         }
     }
 }

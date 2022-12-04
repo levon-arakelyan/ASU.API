@@ -2,12 +2,7 @@
 using ASU.Core.Database.Entities;
 using ASU.Core.Services;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace ASU.Database
 {
@@ -143,6 +138,23 @@ namespace ASU.Database
         {
             AuditChanges();
             await _context.SaveChangesAsync();
+        }
+
+        public IEnumerable<T> BulkDelete(IEnumerable<T> entities)
+        {
+            _context.Set<T>().RemoveRange(entities);
+            return default(IEnumerable<T>);
+        }
+
+        public IEnumerable<T> BulkDeleteWhere(Expression<Func<T, bool>> predicate)
+        {
+            return BulkDelete(_context.Set<T>().Where(predicate));
+        }
+
+        public IEnumerable<T> BulkAdd(IEnumerable<T> entities)
+        {
+            _context.Set<T>().AddRange(entities);
+            return default(IEnumerable<T>);
         }
 
         private void AuditChanges()

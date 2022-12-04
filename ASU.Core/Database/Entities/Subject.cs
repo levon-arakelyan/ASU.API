@@ -7,6 +7,8 @@ namespace ASU.Core.Database.Entities
         [Key]
         public int Id { get; set; }
         public string Name { get; set; }
+        public int SubjectGroupId { get; set; }
+        public virtual SubjectGroup SubjectGroup { get; set; }
         public virtual ICollection<CourseSubject> CourseSubjects { get; set; }
         public virtual ICollection<StudentSubject> StudentSubjects { get; set; }
         public virtual ICollection<TeacherSubject> TeacherSubjects { get; set; }

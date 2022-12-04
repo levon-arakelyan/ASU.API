@@ -13,12 +13,19 @@ namespace ASU.Services
         {
             services.AddTransient<IAuthUtility, AuthUtility>();
             services.AddTransient<IAccountsService, AccountsService>();
+            services.AddTransient<IAudienciesService, AudienciesService>();
             services.AddTransient<IFacultiesService, FacultiesService>();
+            services.AddTransient<IProfessionsService, ProfessionsService>();
             services.AddTransient<ITeachersService, TeachersService>();
+            services.AddTransient<ICoursesService, CoursesService>();
             services.AddTransient<IStudentsService, StudentsService>();
+            services.AddTransient<ISubjectsService, SubjectsService>();
+            services.AddTransient<ISchedulesService, SchedulesService>();
+            services.AddTransient<ISubjectGroupsService, SubjectGroupsService>();
             services.AddTransient<IDepartmentsService, DepartmentsService>();
             services.AddTransient<IFacultyHeadsService, FacultyHeadsService>();
             services.AddTransient<IDepartmentHeadsService, DepartmentHeadsService>();
+            services.AddTransient<ITeacherSubjectsService, TeacherSubjectsService>();
         }
     }
 }

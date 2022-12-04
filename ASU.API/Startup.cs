@@ -51,13 +51,6 @@ namespace ASU.API
             var authSettings = Configuration.GetSection(AppSettings.AuthorizationSettings).Get<AuthorizationSettings>();
             services
                 .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-                /*.AddJwtBearer(options =>
-                {
-                    options.Authority = authSettings.Authority;
-                    options.TokenValidationParameters.ValidAudience = authSettings.Audience;
-                    options.RequireHttpsMetadata = authSettings.RequireHttpsMetadata;
-                    options.TokenValidationParameters.NameClaimType = "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress";
-                });*/
                 .AddJwtBearer(options =>
                 {
                     options.TokenValidationParameters = new TokenValidationParameters
@@ -74,7 +67,7 @@ namespace ASU.API
 
             services.AddAuthorization();
 
-            services.AddControllers();
+            services.AddControllers().AddNewtonsoftJson();
             services.AddMvc()
                 .AddNewtonsoftJson(x => x.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore);
 

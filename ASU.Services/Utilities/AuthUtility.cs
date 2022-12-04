@@ -50,5 +50,10 @@ namespace ASU.Services.Utilities
                 Token = new JwtSecurityTokenHandler().WriteToken(token)
             };
         }
+
+        public static string GenerateTemporaryTeacherPassword()
+        {
+            return BCrypt.Net.BCrypt.HashPassword("teacher");
+        }
     }
 }

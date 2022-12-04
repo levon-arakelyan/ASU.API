@@ -6,7 +6,9 @@ namespace ASU.Core.Services
 {
     public interface IDepartmentsService
     {
-        Task Add(DepartmentDTO facultyDto);
-        Task<PagedItemsList<DepartmentDTO>> GetPaged(int page, int pageSize, string orderBy = "id", OrderDirection direction = OrderDirection.Descending, string filter = "");
+        Task<DepartmentDTO> Get(int departmentId);
+        Task Add(NewDepartment department);
+        PagedItemsList<DepartmentDTO> GetPaged(int page, int pageSize, string orderBy = "id", OrderDirection direction = OrderDirection.Descending, string? filter = "");
+        Task<ICollection<DepartmentDTO>> GetAll();
     }
 }

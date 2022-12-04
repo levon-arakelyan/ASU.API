@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using ASU.Core.Enums;
+using System.ComponentModel.DataAnnotations;
 
 namespace ASU.Core.Database.Entities
 {
@@ -7,9 +8,7 @@ namespace ASU.Core.Database.Entities
         [Key]
         public int Id { get; set; }
         public int Number { get; set; }
-        public bool HasComputers { get; set; }
-        public bool HasProjector { get; set; }
-        public bool HasBlackboard { get; set; }
+        public AudienceType Type { get; set; } = AudienceType.Common;
         public virtual ICollection<Schedule> Schedule { get; set; }
     }
 }

@@ -9,7 +9,6 @@ namespace ASU.Core.DTO
         public string LastName { get; set; }
         public string Email { get; set; }
         public string Password { get; set; }
-        public StudentDegree Degree { get; set; }
         public StudentGroup Group { get; set; }
         public CourseDTO Course { get; set; }
         public ICollection<StudentSubjectDTO> StudentSubjects { get; set; }
