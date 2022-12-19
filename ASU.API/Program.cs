@@ -1,3 +1,5 @@
+using NLog.Web;
+
 namespace ASU.API
 {
     class Program
@@ -10,6 +12,12 @@ namespace ASU.API
         public static IHostBuilder CreateHostBuilder(string[] args) =>
            Host.CreateDefaultBuilder(args)
                .UseSystemd()
-               .ConfigureWebHostDefaults(webBuilder => { webBuilder.UseStartup<Startup>(); });
+               .ConfigureWebHostDefaults(webBuilder => { webBuilder.UseStartup<Startup>(); })
+               .ConfigureLogging(logging =>
+               {
+                   logging.ClearProviders();
+                   logging.SetMinimumLevel(LogLevel.Trace);
+               })
+               .UseNLog();
     }
 }

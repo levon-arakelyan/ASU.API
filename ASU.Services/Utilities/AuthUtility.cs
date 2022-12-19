@@ -1,5 +1,4 @@
-﻿using ASU.Core.Constants;
-using ASU.Core.Enums;
+﻿using ASU.Core.Enums;
 using ASU.Core.Models;
 using ASU.Core.Services.Utilities;
 using ASU.Core.Settings;
@@ -31,9 +30,6 @@ namespace ASU.Services.Utilities
             {
                 Subject = new ClaimsIdentity(new Claim[]
                 {
-                    /*new Claim(JwtRegisteredClaimNames.Sub, userId.ToString()),
-                    new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                    new Claim(JwtRegisteredClaimNames.Iat, DateTime.UtcNow.Second.ToString(), ClaimValueTypes.Integer64),*/
                     new Claim(JwtRegisteredClaimNames.Aud, _authorizationSettings.Audience),
                     new Claim(JwtRegisteredClaimNames.Iss, _authorizationSettings.Issuer),
                     new Claim(ClaimTypes.NameIdentifier, userId.ToString()),

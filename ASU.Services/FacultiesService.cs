@@ -4,6 +4,7 @@ using ASU.Core.DTO;
 using ASU.Core.Enums;
 using ASU.Core.Models;
 using ASU.Core.Services;
+using ASU.Infrastructure.Exceptions;
 using ASU.Services.Utilities;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
@@ -47,6 +48,7 @@ namespace ASU.Services
 
         public async Task<ICollection<FacultyDTO>> GetAll()
         {
+            throw new BadRequestException("Ֆակուլտետը չի գտնվել");
             var faculties = await GetQuery().ToListAsync();
             return _mapper.Map<ICollection<Faculty>, ICollection<FacultyDTO>>(faculties);
         }

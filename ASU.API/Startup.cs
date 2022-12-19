@@ -11,6 +11,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
 using System.Text;
+using ASU.Infrastructure.Middlewares;
 
 namespace ASU.API
 {
@@ -28,7 +29,6 @@ namespace ASU.API
 
             services.AddHttpContextAccessor();
             services.AddMemoryCache();
-
             services.AddCors(options =>
             {
                 options.AddPolicy(AppConstants.CorsPolicy, 
@@ -68,8 +68,7 @@ namespace ASU.API
             services.AddAuthorization();
 
             services.AddControllers().AddNewtonsoftJson();
-            services.AddMvc()
-                .AddNewtonsoftJson(x => x.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore);
+            services.AddMvc().AddNewtonsoftJson(x => x.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore);
 
             var drTypes = new[]
             {
@@ -106,7 +105,7 @@ namespace ASU.API
             app.UseRouting();
             app.UseAuthentication();
             app.UseAuthorization();
-            //app.ConfigureCustomExceptionMiddleware();
+            app.ConfigureCustomExceptionMiddleware();
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
