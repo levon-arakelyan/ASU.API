@@ -130,6 +130,18 @@ namespace ASU.Services
             await _teacherSubjectsService.EditSubjects(teacherId, teacherModel.SubjectIds);
         }
 
+        public async Task<ICollection<TeacherDTO>> GetBySubject(int subjectId)
+        {
+            var teachers = await GetQuery().Where(x => x.TeacherSubjects.Any(y => y.SubjectId == subjectId)).ToListAsync();
+            return _mapper.Map<ICollection<Teacher>, ICollection<TeacherDTO>>(teachers);
+        }
+
+        public async Task<ICollection<TeacherDTO>> GetAll()
+        {
+            var teachers = await GetQuery().ToListAsync();
+            return _mapper.Map<ICollection<Teacher>, ICollection<TeacherDTO>>(teachers);
+        }
+
         private IQueryable<Teacher> GetQuery()
         {
             return _teachersTable

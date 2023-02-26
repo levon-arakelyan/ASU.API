@@ -4,24 +4,26 @@ using ASU.Core.DTO;
 using ASU.Core.Enums;
 using ASU.Core.Models;
 using ASU.Core.Services;
+using ASU.Infrastructure.Exceptions;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
 
 namespace ASU.Services
 {
     public class SchedulesService : ISchedulesService
     {
         private readonly IDatabaseTable<Schedule> _schedulesTable;
-        private readonly ITeachersService _teachersService;
-        private readonly IAudienciesService _audienciesService;
-        private readonly ICoursesService _coursesService;
-        private readonly ISubjectsService _subjectsService;
+        private readonly ICourseSubjectsService _courseSubjectsService;
         private readonly IMapper _mapper;
 
-        private const int maxClassesPerDay = 4;
+        private const string ErrorNoSchedule = "Ընտրված կուրսը դասացուցակ չունի";
+        private const string ErrorWrongSchedule = "Դասացուցակը սխալ է կազմված";
 
-        private readonly List<DayOfWeek> weekDays = new()
+        private const int MaxClassesPerDay = 4;
+        private const int MaxRecordsForSingleClass = 2;
+        private const int ClassNumbers = 4;
+
+        private readonly List<DayOfWeek> WeekDays = new()
         {
             DayOfWeek.Monday,
             DayOfWeek.Tuesday,
@@ -32,106 +34,262 @@ namespace ASU.Services
 
         public SchedulesService(
             IDatabaseTable<Schedule> schedulesTable,
-            ITeachersService teachersService,
-            IAudienciesService audienciesService,
-            ICoursesService coursesService,
-            ISubjectsService subjectsService,
+            ICourseSubjectsService courseSubjectsService,
             IMapper mapper
         )
         {
             _schedulesTable = schedulesTable;
-            _teachersService = teachersService;
-            _audienciesService = audienciesService;
-            _coursesService = coursesService;
-            _subjectsService = subjectsService;
+            _courseSubjectsService = courseSubjectsService;
             _mapper = mapper;
         }
 
-        public async Task<ICollection<ScheduleDTO>> GetForCourse(int courseId)
+        public async Task<ICollection<ScheduleDTO>> GetScheduleForCourse(int courseId)
         {
             var schedule = await GetQuery().Where(x => x.CourseId == courseId).ToListAsync();
             return _mapper.Map<ICollection<Schedule>, ICollection<ScheduleDTO>>(schedule);
         }
 
-        public async Task<ICollection<ScheduleDTO>> GenerateScheduleForCourse(int courseId, ICollection<SubjectForSchedule> subjects)
+        public async Task<List<List<ScheduleClassGroup>>> GetRegularScheduleForCourse(int courseId)
         {
-            var audiencies = await _audienciesService.GetAll();
-            List<ScheduleDTO> schedule = new List<ScheduleDTO>();
-
-            var repeatitions = subjects.Select(x => x.Repeat).Sum();
-            if (repeatitions > weekDays.Count * maxClassesPerDay)
-            {
-                return null;
-            }
-
-            var weekDayIndex = 0;
-            var recordedSubjects = new Dictionary<int, int>();
-            for(int i = 0; i < repeatitions; i++)
-            {
-                var weekDay = weekDays[weekDayIndex];
-
-                var subjectId = subjects.FirstOrDefault()?.SubjectId;
-                if (subjectId == null)
-                {
-                    break;
-                }
-                var subject = await _subjectsService.Get((int)subjectId);
-                var teachers = await _teachersService.GetBySubjectId(subject.Id);
-                if (teachers == null)
-                {
-                    return null;
-                }
-                var teacher = teachers.FirstOrDefault();
-                var audience = audiencies.FirstOrDefault(x => x.Type == subjects.FirstOrDefault()?.AudienceType);
-
-                schedule.Add(new ScheduleDTO()
-                {
-                    Subject = subject,
-                    Audience = audience,
-                    Teacher = teacher,
-                    DayOfWeek = weekDay,
-                    ClassNumber = (ClassNumber)(i / weekDays.Count)
-                });
-
-                var first = subjects.First();
-                first.Repeat--;
-                if (first.Repeat == 0)
-                {
-                    subjects = subjects.Skip(1).ToList();
-                }
-
-                weekDayIndex = (weekDayIndex + 1) % weekDays.Count;
-            }
-
-           return schedule;
+            var schedule = await GetScheduleForCourse(courseId);
+            return TransformForRegularSchedule(schedule);
         }
 
-        public async Task AddForCourse(int courseId, ICollection<NewCourseSchedule> schedules)
+        public async Task<List<List<ScheduleEditableClassGroup>>> GetEditableScheduleForCourse(int courseId)
         {
-            var course = await _coursesService.Get(courseId);
-            var schedulesToAdd = new List<Schedule>();
+            var schedule = await GetScheduleForCourse(courseId);
+            return TransformForEditableSchedule(schedule);
+        }
 
-            foreach(var schedule in schedules)
+        public async Task SaveScheduleForCourse(int courseId, ICollection<ICollection<ScheduleEditableClassGroup>> groups)
+        {
+            if (groups == null || !groups.Any() || groups.Any(x => !x.Any())) // TODO: add more checking
             {
-                var scheduleEntity = _mapper.Map<NewCourseSchedule, Schedule>(schedule);
-                scheduleEntity.CourseId = courseId;
-                scheduleEntity.StudentGroup = StudentGroup.First;
-                schedulesToAdd.Add(scheduleEntity);
-
-                for (int i = 1; i < course.GroupsNumber; i++)
-                {
-                    var scheduleClone = _mapper.Map<NewCourseSchedule, Schedule>(schedule);
-                    scheduleClone.CourseId = courseId;
-                    scheduleClone.StudentGroup = (StudentGroup)(i);
-                    schedulesToAdd.Add(scheduleClone);
-                }
-
+                throw new BadRequestException(ErrorWrongSchedule);
             }
 
-            _schedulesTable.BulkAdd(schedulesToAdd);
+            List<Schedule> schedules = new();
+
+            for (int i = 0; i < groups.Count; i++)
+            {
+                var row = groups.ElementAt(i);
+                for (int j = 0; j < row.Count; j++)
+                {
+                    var group = row.ElementAt(j);
+                    for (int k = 0; k < MaxRecordsForSingleClass; k++)
+                    {
+                        if (!group.Classes.Any())
+                        {
+                            continue;
+                        }
+
+                        var groupClass = group.Classes.ElementAt(group.ClassType == ScheduleClassType.Normal ? 0 : k);
+                        if (groupClass.AudienceId <= 0 || groupClass.TeacherId <= 0 || groupClass.SubjectId <= 0)
+                        {
+                            continue;
+                        }
+
+                        schedules.Add(new Schedule()
+                        {
+                            CourseId = courseId,
+                            SubjectId = groupClass.SubjectId,
+                            TeacherId = groupClass.TeacherId,
+                            AudienceId = groupClass.AudienceId,
+                            DayOfWeek = (DayOfWeek)i,
+                            ClassNumber = (ClassNumber)j,
+                            StudentGroup = (StudentGroup)k,
+                            IsFractionAbove = group.ClassType == ScheduleClassType.Fraction ? k == 0 : null
+                        });
+                    }
+                }
+            }
+
+            if (_schedulesTable.Queryable().Any(x => x.CourseId == courseId))
+            {
+                _schedulesTable.BulkDeleteWhere(x => x.CourseId == courseId);
+            }
+            _schedulesTable.BulkAdd(schedules);
+            await _schedulesTable.CommitAsync();
+
+            await _courseSubjectsService.Save(schedules);
+        }
+
+        public async Task DeleteScheduleForCourse(int courseId)
+        {
+            var schedules = await _schedulesTable.Queryable().Where(x => x.CourseId == courseId).ToListAsync();
+            if (schedules == null || !schedules.Any()) {
+                throw new BadRequestException(string.Format(ErrorNoSchedule, courseId));
+            }
+
+            _schedulesTable.BulkDelete(schedules);
             await _schedulesTable.CommitAsync();
         }
 
+        private List<List<ScheduleEditableClassGroup>> TransformForEditableSchedule(ICollection<ScheduleDTO> schedule)
+        {
+            var classes = new List<List<ScheduleEditableClassGroup>>();
+            if (!schedule.Any())
+            {
+                WeekDays.ForEach(x =>
+                {
+                    var row = new List<ScheduleEditableClassGroup>();
+                    for (int i = 0; i < MaxClassesPerDay; i++)
+                    {
+                        row.Add(new ScheduleEditableClassGroup()
+                        {
+                            Classes = new List<ScheduleEditableClass>() { new ScheduleEditableClass() }
+                        });
+                    }
+                    classes.Add(row);
+                });
+                return classes;
+            }
+
+            for (int i = 0; i < WeekDays.Count; i++)
+            {
+                classes.Add(new List<ScheduleEditableClassGroup>());
+                var weekDaySubjects = schedule.Where(x => (int)x.DayOfWeek == i);
+                var groupedByClassNumber = new List<List<ScheduleDTO>>();
+                for (int j = 0; j < ClassNumbers; j++)
+                {
+                    var scheduleClass = weekDaySubjects.Where(x => (int)x.ClassNumber == j).ToList();
+                    groupedByClassNumber.Add(scheduleClass);
+                }
+
+                groupedByClassNumber.ForEach(classesDto =>
+                {
+                    var first = classesDto.FirstOrDefault();
+                    var second = classesDto.LastOrDefault();
+                    if (first != null && second != null)
+                    {
+                        if (first == second)
+                        {
+                            classes.ElementAt(i).Add(new ScheduleEditableClassGroup()
+                            {
+                                ClassType = ScheduleClassType.Fraction,
+                                Classes = first.IsFractionAbove != null && first.IsFractionAbove == true ?
+                                    new List<ScheduleEditableClass>() { _mapper.Map<ScheduleDTO, ScheduleEditableClass>(first), new ScheduleEditableClass() } :
+                                    new List<ScheduleEditableClass>() { new ScheduleEditableClass(), _mapper.Map<ScheduleDTO, ScheduleEditableClass>(first) }
+                            });
+                        }
+                        else
+                        {
+                            var classType = ScheduleClassType.Group;
+                            var scheduleClasses = new List<ScheduleEditableClass>
+                            {
+                                _mapper.Map<ScheduleDTO, ScheduleEditableClass>(first),
+                                _mapper.Map<ScheduleDTO, ScheduleEditableClass>(second)
+                            };
+
+                            if (first.IsFractionAbove != null && second.IsFractionAbove != null)
+                            {
+                                classType = ScheduleClassType.Fraction;
+                            }
+                            else if (first.Subject.Id == second.Subject.Id && first.Teacher.Id == second.Teacher.Id && first.Audience.Id == second.Audience.Id)
+                            {
+                                classType = ScheduleClassType.Normal;
+                                scheduleClasses = new List<ScheduleEditableClass>() { _mapper.Map<ScheduleDTO, ScheduleEditableClass>(first ?? second) };
+                            }
+
+                            classes.ElementAt(i).Add(new ScheduleEditableClassGroup()
+                            {
+                                ClassType = classType,
+                                Classes = scheduleClasses
+                            });
+                        }
+                    }
+                    else
+                    {
+                        classes.ElementAt(i).Add(new ScheduleEditableClassGroup()
+                        {
+                            Classes = new List<ScheduleEditableClass>()
+                        });
+                    }
+                });
+            }
+
+            classes.ForEach(row => row.ForEach(group => 
+            {
+                if (!group.Classes.Any())
+                {
+                    group.Classes = new List<ScheduleEditableClass>() { new ScheduleEditableClass() };
+                }
+            }));
+
+            return classes;
+        }
+
+        private List<List<ScheduleClassGroup>> TransformForRegularSchedule(ICollection<ScheduleDTO> schedule)
+        {
+            var classes = new List<List<ScheduleClassGroup>>();
+            for (int i = 0; i < WeekDays.Count; i++)
+            {
+                classes.Add(new List<ScheduleClassGroup>());
+                var weekDaySubjects = schedule.Where(x => (int)x.DayOfWeek == i);
+                var groupedByClassNumber = new List<List<ScheduleDTO>>();
+                for (int j = 0; j < ClassNumbers; j++)
+                {
+                    var scheduleClass = weekDaySubjects.Where(x => (int)x.ClassNumber == j).ToList();
+                    groupedByClassNumber.Add(scheduleClass);
+                }
+
+                groupedByClassNumber.ForEach(classesDto =>
+                {
+                    var first = classesDto.FirstOrDefault();
+                    var second = classesDto.LastOrDefault();
+                    if (first != null && second != null)
+                    {
+                        if (first == second)
+                        {
+                            classes.ElementAt(i).Add(new ScheduleClassGroup()
+                            {
+                                ClassType = ScheduleClassType.Fraction,
+                                HasClasses = true,
+                                Classes = first.IsFractionAbove != null && first.IsFractionAbove == true ?
+                                    new List<ScheduleClass>() { _mapper.Map<ScheduleDTO, ScheduleClass>(first), new ScheduleClass() } :
+                                    new List<ScheduleClass>() { new ScheduleClass(), _mapper.Map<ScheduleDTO, ScheduleClass>(first) }
+                            });
+                        }
+                        else
+                        {
+                            var classType = ScheduleClassType.Group;
+                            var scheduleClasses = new List<ScheduleClass>
+                            {
+                                _mapper.Map<ScheduleDTO, ScheduleClass>(first),
+                                _mapper.Map<ScheduleDTO, ScheduleClass>(second)
+                            };
+
+                            if (first.IsFractionAbove != null && second.IsFractionAbove != null)
+                            {
+                                classType = ScheduleClassType.Fraction;
+                            }
+                            else if (first.Subject.Id == second.Subject.Id && first.Teacher.Id == second.Teacher.Id && first.Audience.Id == second.Audience.Id)
+                            {
+                                classType = ScheduleClassType.Normal;
+                                scheduleClasses = new List<ScheduleClass>() { _mapper.Map<ScheduleDTO, ScheduleClass>(first ?? second) };
+                            }
+
+                            classes.ElementAt(i).Add(new ScheduleClassGroup()
+                            {
+                                ClassType = classType,
+                                HasClasses = true,
+                                Classes = scheduleClasses
+                            });
+                        }
+                    }
+                    else
+                    {
+                        classes.ElementAt(i).Add(new ScheduleClassGroup()
+                        {
+                            HasClasses = false,
+                            Classes = new List<ScheduleClass>()
+                        });
+                    }
+                });
+            }
+
+            return classes;
+        }
 
         private IQueryable<Schedule> GetQuery()
         {

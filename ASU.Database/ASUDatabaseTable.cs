@@ -157,6 +157,12 @@ namespace ASU.Database
             return default(IEnumerable<T>);
         }
 
+        public IEnumerable<T> BulkUpdate(IEnumerable<T> entities)
+        {
+            _context.Set<T>().UpdateRange(entities);
+            return default(IEnumerable<T>);
+        }
+
         private void AuditChanges()
         {
             var userId = _claimsService.UserId;

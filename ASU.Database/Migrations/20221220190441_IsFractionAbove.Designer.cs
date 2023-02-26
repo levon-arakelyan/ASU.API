@@ -4,6 +4,7 @@ using ASU.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ASU.Database.Migrations
 {
     [DbContext(typeof(ASUContext))]
-    partial class ASUContextModelSnapshot : ModelSnapshot
+    [Migration("20221220190441_IsFractionAbove")]
+    partial class IsFractionAbove
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -118,6 +120,9 @@ namespace ASU.Database.Migrations
                     b.Property<int>("SubjectId")
                         .HasColumnType("int");
 
+                    b.Property<int>("TeacherId")
+                        .HasColumnType("int");
+
                     b.Property<int?>("UpdatedBy")
                         .HasColumnType("int");
 
@@ -129,6 +134,8 @@ namespace ASU.Database.Migrations
                     b.HasIndex("CourseId");
 
                     b.HasIndex("SubjectId");
+
+                    b.HasIndex("TeacherId");
 
                     b.ToTable("CourseSubjects", "dbo");
                 });
@@ -664,9 +671,17 @@ namespace ASU.Database.Migrations
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
+                    b.HasOne("ASU.Core.Database.Entities.Teacher", "Teacher")
+                        .WithMany("CourseSubjects")
+                        .HasForeignKey("TeacherId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
                     b.Navigation("Course");
 
                     b.Navigation("Subject");
+
+                    b.Navigation("Teacher");
                 });
 
             modelBuilder.Entity("ASU.Core.Database.Entities.Department", b =>
@@ -905,6 +920,8 @@ namespace ASU.Database.Migrations
 
             modelBuilder.Entity("ASU.Core.Database.Entities.Teacher", b =>
                 {
+                    b.Navigation("CourseSubjects");
+
                     b.Navigation("DepartmentHead")
                         .IsRequired();
 

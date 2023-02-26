@@ -26,6 +26,7 @@ namespace ASU.Services
             services.AddTransient<IFacultyHeadsService, FacultyHeadsService>();
             services.AddTransient<IDepartmentHeadsService, DepartmentHeadsService>();
             services.AddTransient<ITeacherSubjectsService, TeacherSubjectsService>();
+            services.AddTransient<ICourseSubjectsService, CourseSubjectsService>();
         }
     }
 }

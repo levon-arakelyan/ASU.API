@@ -23,6 +23,9 @@ namespace ASU.Services.Automapper
             CreateMap<Operation<CourseShortInfo>, Operation<Course>>();
 
             CreateMap<CourseSubjectDTO, CourseSubject>();
+            CreateMap<CourseSubject, CourseSubjectDTO>();
+            CreateMap<JsonPatchDocument<ICollection<CourseSubjectDTO>>, JsonPatchDocument<ICollection<CourseSubject>>>();
+            CreateMap<Operation<ICollection<CourseSubjectDTO>>, Operation<ICollection<CourseSubject>>>();
 
             CreateMap<DepartmentDTO, Department>();
             CreateMap<NewDepartment, Department>();
@@ -46,6 +49,15 @@ namespace ASU.Services.Automapper
             CreateMap<ScheduleDTO, Schedule>();
             CreateMap<Schedule, ScheduleDTO>();
             CreateMap<NewCourseSchedule, Schedule>();
+            CreateMap<ScheduleDTO, ScheduleClass>()
+                .ForMember(d => d.Exists, opt => opt.MapFrom(s => true))
+                .ForMember(d => d.Subject, opt => opt.MapFrom(s => s.Subject.Name))
+                .ForMember(d => d.Teacher, opt => opt.MapFrom(s => s.Teacher.FullName))
+                .ForMember(d => d.Audience, opt => opt.MapFrom(s => s.Audience.Number));
+            CreateMap<ScheduleDTO, ScheduleEditableClass>()
+                .ForMember(d => d.SubjectId, opt => opt.MapFrom(s => s.Subject.Id))
+                .ForMember(d => d.TeacherId, opt => opt.MapFrom(s => s.Teacher.Id))
+                .ForMember(d => d.AudienceId, opt => opt.MapFrom(s => s.Audience.Id));
 
             CreateMap<StudentDTO, Student>();
             CreateMap<StudentDTO, AuthenticatedUser>()

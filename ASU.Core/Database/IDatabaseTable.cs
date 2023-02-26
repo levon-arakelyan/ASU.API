@@ -26,5 +26,6 @@ namespace ASU.Core.Database
         IEnumerable<T> BulkDelete(IEnumerable<T> entities);
         IEnumerable<T> BulkDeleteWhere(Expression<Func<T, bool>> predicate);
         IEnumerable<T> BulkAdd(IEnumerable<T> entities);
+        IEnumerable<T> BulkUpdate(IEnumerable<T> entities);
     }
 }

@@ -18,27 +18,43 @@ namespace ASU.API.Controllers
             _schedulesService = schedulesService;
         }
 
-        [HttpPost]
-        [Route("generate/{courseId}")]
-        public async Task<IActionResult> GenerateScheduleForCourse(int courseId, [FromBody] ICollection<SubjectForSchedule> subjects)
+        [HttpGet]
+        [Route("get-for-course/{courseId}")]
+        public async Task<IActionResult> GetForCourse(int courseId)
         {
-            var schedule = await _schedulesService.GenerateScheduleForCourse(courseId, subjects);
+            var schedule = await _schedulesService.GetScheduleForCourse(courseId);
             return Ok(schedule);
         }
 
         [HttpGet]
-        [Route("get-for-course/{courseId}")]
-        public async Task<IActionResult> GetFourCourse(int courseId)
+        [Route("get-regular-for-course/{courseId}")]
+        public async Task<IActionResult> GetRegularForCourse(int courseId)
         {
-            var schedule = await _schedulesService.GetForCourse(courseId);
+            var schedule = await _schedulesService.GetRegularScheduleForCourse(courseId);
+            return Ok(schedule);
+        }
+
+        [HttpGet]
+        [Route("get-editable-for-course/{courseId}")]
+        public async Task<IActionResult> GetEditableForCourse(int courseId)
+        {
+            var schedule = await _schedulesService.GetEditableScheduleForCourse(courseId);
             return Ok(schedule);
         }
 
         [HttpPost]
-        [Route("add-for-course/{courseId}")]
-        public async Task<IActionResult> AddFourCourse(int courseId, [FromBody] ICollection<NewCourseSchedule> subjects)
+        [Route("save-for-course/{courseId}")]
+        public async Task<IActionResult> SaveForCourse(int courseId, [FromBody] ICollection<ICollection<ScheduleEditableClassGroup>> groups)
         {
-            await _schedulesService.AddForCourse(courseId, subjects);
+            await _schedulesService.SaveScheduleForCourse(courseId, groups);
+            return Ok();
+        }
+
+        [HttpDelete]
+        [Route("delete-for-course/{courseId}")]
+        public async Task<IActionResult> DeleteForCourse(int courseId)
+        {
+            await _schedulesService.DeleteScheduleForCourse(courseId);
             return Ok();
         }
     }

@@ -5,8 +5,10 @@ namespace ASU.Core.Services
 {
     public interface ISchedulesService
     {
-        Task<ICollection<ScheduleDTO>> GenerateScheduleForCourse(int courseId, ICollection<SubjectForSchedule> subjects);
-        Task<ICollection<ScheduleDTO>> GetForCourse(int courseId);
-        Task AddForCourse(int courseId, ICollection<NewCourseSchedule> schedule);
+        Task<ICollection<ScheduleDTO>> GetScheduleForCourse(int courseId);
+        Task<List<List<ScheduleClassGroup>>> GetRegularScheduleForCourse(int courseId);
+        Task<List<List<ScheduleEditableClassGroup>>> GetEditableScheduleForCourse(int courseId);
+        Task SaveScheduleForCourse(int courseId, ICollection<ICollection<ScheduleEditableClassGroup>> groups);
+        Task DeleteScheduleForCourse(int courseId);
     }
 }

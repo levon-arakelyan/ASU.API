@@ -98,7 +98,6 @@ namespace ASU.Database
                 t.HasKey(_ => _.Id);
                 t.HasOne(_ => _.Department).WithMany(_ => _.Teachers).OnDelete(DeleteBehavior.NoAction);
                 t.HasMany(_ => _.TeacherSubjects).WithOne(_ => _.Teacher).OnDelete(DeleteBehavior.NoAction);
-                t.HasMany(_ => _.CourseSubjects).WithOne(_ => _.Teacher).OnDelete(DeleteBehavior.NoAction);
                 t.HasMany(_ => _.Schedule).WithOne(_ => _.Teacher).OnDelete(DeleteBehavior.NoAction);
                 t.HasOne(_ => _.DepartmentHead).WithOne(_ => _.Head).OnDelete(DeleteBehavior.NoAction);
                 t.HasOne(_ => _.FacultyHead).WithOne(_ => _.Head).OnDelete(DeleteBehavior.NoAction);
@@ -121,7 +120,6 @@ namespace ASU.Database
                 t.HasKey(_ => _.Id);
                 t.HasOne(_ => _.Course).WithMany(_ => _.CourseSubjects).OnDelete(DeleteBehavior.NoAction);
                 t.HasOne(_ => _.Subject).WithMany(_ => _.CourseSubjects).OnDelete(DeleteBehavior.NoAction);
-                t.HasOne(_ => _.Teacher).WithMany(_ => _.CourseSubjects).OnDelete(DeleteBehavior.NoAction);
             });
 
             modelBuilder.Entity<TeacherSubject>(t =>
