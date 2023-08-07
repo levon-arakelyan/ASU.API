@@ -117,7 +117,8 @@ namespace ASU.Services
         public async Task DeleteScheduleForCourse(int courseId)
         {
             var schedules = await _schedulesTable.Queryable().Where(x => x.CourseId == courseId).ToListAsync();
-            if (schedules == null || !schedules.Any()) {
+            if (schedules == null || !schedules.Any())
+            {
                 throw new BadRequestException(string.Format(ErrorNoSchedule, courseId));
             }
 

@@ -45,8 +45,15 @@ namespace ASU.Services
                 .Queryable()
                 .AsEnumerable()
                 .Where(x => !distinctsBySubject.Exists(y => y.SubjectId == x.SubjectId && y.CourseId == x.CourseId));
-            _courseSubjectsTable.BulkAdd(newCourseSubjects);
-            _courseSubjectsTable.BulkDelete(courseSubjectsToDelete);
+
+            if (newCourseSubjects.Any())
+            {
+                _courseSubjectsTable.BulkAdd(newCourseSubjects);
+            }
+            if (courseSubjectsToDelete.Any())
+            {
+                _courseSubjectsTable.BulkDelete(courseSubjectsToDelete);
+            }
             await _courseSubjectsTable.CommitAsync();
         }
 
