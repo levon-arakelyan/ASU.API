@@ -21,7 +21,6 @@ namespace ASU.Services
             services.AddTransient<IStudentsService, StudentsService>();
             services.AddTransient<ISubjectsService, SubjectsService>();
             services.AddTransient<ISchedulesService, SchedulesService>();
-            services.AddTransient<ISubjectGroupsService, SubjectGroupsService>();
             services.AddTransient<IDepartmentsService, DepartmentsService>();
             services.AddTransient<IFacultyHeadsService, FacultyHeadsService>();
             services.AddTransient<IDepartmentHeadsService, DepartmentHeadsService>();

@@ -22,7 +22,6 @@ namespace ASU.Database
         public virtual DbSet<StudentSubject> StudentSubjects { get; set; }
         public virtual DbSet<TeacherSubject> TeacherSubjects { get; set; }
         public virtual DbSet<Schedule> Schedules { get; set; }
-        public virtual DbSet<SubjectGroup> SubjectGroups { get; set; }
  
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -111,7 +110,6 @@ namespace ASU.Database
                 t.HasMany(_ => _.StudentSubjects).WithOne(_ => _.Subject).OnDelete(DeleteBehavior.NoAction);
                 t.HasMany(_ => _.TeacherSubjects).WithOne(_ => _.Subject).OnDelete(DeleteBehavior.NoAction);
                 t.HasMany(_ => _.Schedule).WithOne(_ => _.Subject).OnDelete(DeleteBehavior.NoAction);
-                t.HasOne(_ => _.SubjectGroup).WithMany(_ => _.Subjects).OnDelete(DeleteBehavior.NoAction);
             });
 
             modelBuilder.Entity<CourseSubject>(t =>
@@ -147,13 +145,6 @@ namespace ASU.Database
                 t.HasOne(_ => _.Teacher).WithMany(_ => _.Schedule).OnDelete(DeleteBehavior.NoAction);
                 t.HasOne(_ => _.Subject).WithMany(_ => _.Schedule).OnDelete(DeleteBehavior.NoAction);
                 t.HasOne(_ => _.Audience).WithMany(_ => _.Schedule).OnDelete(DeleteBehavior.NoAction);
-            });
-
-            modelBuilder.Entity<SubjectGroup>(t =>
-            {
-                t.ToTable("SubjectGroups", "dbo");
-                t.HasKey(_ => _.Id);
-                t.HasMany(_ => _.Subjects).WithOne(_ => _.SubjectGroup).OnDelete(DeleteBehavior.NoAction);
             });
 
             SeedData(modelBuilder);

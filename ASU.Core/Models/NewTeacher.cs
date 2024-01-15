@@ -11,5 +11,6 @@ namespace ASU.Core.Models
         public int DepartmentId { get; set; }
         public bool IsDepartmentHead { get; set; }
         public bool IsFacultyHead { get; set; }
+        public int[] SubjectsIds { get; set; }
     }
 }

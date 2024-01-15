@@ -64,8 +64,7 @@ namespace ASU.Services
         private IQueryable<Subject> GetQuery()
         {
             return _subjectsTable
-                .Queryable()
-                .Include(x => x.SubjectGroup);
+                .Queryable();
         }
     }
 }

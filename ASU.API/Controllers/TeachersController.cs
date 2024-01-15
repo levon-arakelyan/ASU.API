@@ -47,16 +47,14 @@ namespace ASU.API.Controllers
             return Ok();
         }
 
-        [HttpGet]
-        [Route("get-by-subject/{subjectId}")]
+        [HttpGet("get-by-subject/{subjectId}")]
         public async Task<IActionResult> GetBySubject(int subjectId)
         {
             var teachers = await _teachersService.GetBySubject(subjectId);
             return Ok(teachers);
         }
 
-        [HttpGet]
-        [Route("get-all")]
+        [HttpGet("get-all")]
         public async Task<IActionResult> GetAll()
         {
             var teachers = await _teachersService.GetAll();

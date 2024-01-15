@@ -71,10 +71,6 @@ namespace ASU.Services.Automapper
             CreateMap<Subject, SubjectDTO>();
             CreateMap<NewSubject, Subject>();
 
-            CreateMap<SubjectGroupDTO, SubjectGroup>();
-            CreateMap<SubjectGroup, SubjectGroupDTO>();
-            CreateMap<NewSubjectGroup, SubjectGroup>();
-
             CreateMap<TeacherDTO, Teacher>();
             CreateMap<NewTeacher, Teacher>();
             CreateMap<Teacher, TeacherDTO>();

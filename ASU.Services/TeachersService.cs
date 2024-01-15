@@ -102,6 +102,10 @@ namespace ASU.Services
                     await _departmentHeadsService.TryEdit(department.Id, teacher.Id, true);
                 }
             }
+            if (teacherDto.SubjectsIds.Any())
+            {
+                await _teacherSubjectsService.EditSubjects(teacher.Id, teacherDto.SubjectsIds);
+            }
         }
 
         public PagedItemsList<TeacherDTO> GetPaged(int page, int pageSize, string orderBy = "id", OrderDirection direction = OrderDirection.Descending, string? filter = "")
